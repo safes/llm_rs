@@ -1,0 +1,72 @@
+[package]
+name = "llm_rs"
+version = "0.1.0"
+edition = "2021"
+authors = ["LLM.rs Contributors"]
+description = "GPT-2 training implementation in Rust, converted from llm.c"
+license = "MIT"
+repository = "https://github.com/yourusername/llm.rs"
+
+[dependencies]
+# Tensor operations and linear algebra
+ndarray = { version = "0.15", features = ["rayon"] }
+ndarray-rand = "0.14"
+blas-src = { version = "0.10", features = ["openblas"], optional = true }
+openblas-src = { version = "0.10", features = ["cblas", "system"], optional = true }
+
+# Parallelism (replaces OpenMP)
+rayon = "1.8"
+
+# Random number generation
+rand = "0.8"
+rand_distr = "0.4"
+
+# Binary I/O and serialization
+byteorder = "1.5"
+memmap2 = "0.9"
+serde = { version = "1.0", features = ["derive"] }
+bincode = "1.3"
+
+# CLI and logging
+clap = { version = "4.4", features = ["derive"] }
+env_logger = "0.11"
+log = "0.4"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Math utilities
+num-traits = "0.2"
+
+# FFI
+libc = "0.2"
+
+# Optional: Add tempfile for tests
+tempfile = "3.8"
+
+[dev-dependencies]
+criterion = "0.5"
+approx = "0.5"
+
+[build-dependencies]
+cc = "1.0"
+
+[features]
+default = []  # Pure Rust by default
+cpu-optimized = ["blas-src", "openblas-src"]  # Optional BLAS acceleration
+cuda = []  # Placeholder for future CUDA support
+multi-gpu = ["cuda"]
+
+[[bin]]
+name = "train_gpt2"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true
+
+[profile.bench]
+inherits = "release"
